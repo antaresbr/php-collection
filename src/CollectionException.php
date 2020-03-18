@@ -34,9 +34,19 @@ class CollectionException extends Exception
      * @param  string  $type
      * @return static
      */
-    public static function forInvalidType($collectionType, $type)
+    public static function forInvalidItemType($collectionType, $type)
     {
         return new static("The collection type '${collectionType}' cannot have item of type '{$type}'.");
+    }
+
+    /**
+     * Create a new exception for no key supplied
+     *
+     * @return static
+     */
+    public static function forNoKeySupplied()
+    {
+        return new static("No key supplied.");
     }
 
     /**
@@ -50,46 +60,47 @@ class CollectionException extends Exception
     }
 
     /**
-     * Create a new exception for not defined id
-     *
-     * @return static
-     */
-    public static function forNotDefinedId()
-    {
-        return new static("Item ID not defined.");
-    }
-
-    /**
-     * Create a new exception for already defined id
+     * Create a new exception for already defined Key
      * 
-     * @param  mixed  $id
+     * @param  mixed  $key
      * @return static
      */
-    public static function forAlreadyDefinedId($id)
+    public static function forAlreadyDefinedKey($key)
     {
-        return new static("Already defined ID: {$id}.");
+        return new static("Already defined key: {$key}.");
     }
 
     /**
-     * Create a new exception for not found id
+     * Create a new exception for item that already exists in the collection
      * 
-     * @param  mixed  $id
+     * @param  mixed  $item
      * @return static
      */
-    public static function forNotFoundId($id)
+    public static function forItemAlreadyExists($item)
     {
-        return new static("Not found ID: '{$id}'.");
+        return new static("Collection item already exists: ". print_r($item, true));
     }
 
     /**
-     * Create a new exception for change id property attenpt
-     *
-     * @param  string  $id
+     * Create a new exception for key not found 
+     * 
+     * @param  mixed  $key
      * @return static
      */
-    public static function forChangeIdPropertyAttempt($id)
+    public static function forKeyNotFound($key)
     {
-        return new static("Change ID property attempt: '{$id}'.");
+        return new static("Key not found: '{$key}'.");
+    }
+
+    /**
+     * Create a new exception for item not found 
+     * 
+     * @param  mixed  $item
+     * @return static
+     */
+    public static function forItemNotFound($item)
+    {
+        return new static("Item not found: ". print_r($item, true));
     }
 
 }

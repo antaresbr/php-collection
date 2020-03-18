@@ -1,0 +1,8 @@
+<phpunit testdox="true" colors="true">
+    <testsuites>
+        <testsuite name="Collection tests">
+            <file>tests/SimpleCollectionTest.php</file>
+            <file>tests/AssociativeCollectionTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>

@@ -28,11 +28,25 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
     private $associative;
 
     /**
+     * Flag to indicate whether this collection has unique items
+     *
+     * @var boolean
+     */
+    private $unique;
+
+    /**
+     * Flag to indicate whether this collection accept null item
+     *
+     * @var boolean
+     */
+    private $acceptNulls;
+
+    /**
      * The array with the items
      *
      * @var array
      */
-    protected $items = [];
+    protected $data = [];
 
     /**
      * Create a new instance of this object.
@@ -40,34 +54,25 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
      * @param  Class  $type
      * @return void
      */
-    public function __construct($type, $associative = true)
+    public function __construct($type, $associative = true, $unique = true, $acceptNulls = true)
     {
         if (empty($type)) {
             throw CollectionException::forNotDefinedItemType();
         }
 
-        if (strpos(static::VALID_TYPES . ',', strtolower($type).',') !== false) {
+        if (strpos(static::VALID_TYPES . ',', strtolower($type) . ',') !== false) {
             $this->type = strtolower($type);
-        }
-        else {
+        } else {
             if (class_exists($type)) {
                 $this->type = $type;
-            }
-            else {
+            } else {
                 throw CollectionException::forNonExistentType($type);
             }
         }
 
         $this->associative = $associative;
-    }
-    
-    /**
-     * Get items count
-     *
-     * @return integer
-     */
-    public function count() {
-        return count($this->items);
+        $this->unique = $unique;
+        $this->acceptNulls = $acceptNulls;
     }
 
     /**
@@ -75,8 +80,19 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
      *
      * @return integer
      */
-    public function getIterator() {
-        return new ArrayIterator($this->items);
+    public function count()
+    {
+        return count($this->data);
+    }
+
+    /**
+     * Get items count
+     *
+     * @return integer
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->data);
     }
 
     /**
@@ -84,7 +100,8 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
      *
      * @return string
      */
-    public function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
@@ -93,7 +110,8 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
      *
      * @return boolean
      */
-    public function isEmpty() {
+    public function isEmpty()
+    {
         return ($this->count() == 0);
     }
 
@@ -102,38 +120,79 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
      *
      * @return boolean
      */
-    public function isAssociative() {
+    public function isAssociative()
+    {
         return $this->associative;
     }
 
     /**
-     * Get items id list
+     * Get unique flag
      *
-     * @return array
+     * @return boolean
      */
-    public function idList() {
-        return array_keys($this->items);
+    public function isUnique()
+    {
+        return $this->unique;
     }
 
     /**
-     * Check if id is a collection member
+     * Get accept null flag
      *
-     * @param  mixed $id
-     * @param  boolean $throwException
      * @return boolean
      */
-    public function hasId($id, $throwException = false) {
-        if (empty($id)) {
-            throw CollectionException::forNotDefinedId();
-        }
+    public function canAcceptNulls()
+    {
+        return $this->acceptNulls;
+    }
 
-        $r = $this->isAssociative() ? array_key_exists($id, $this->items) : (array_search($id, $this->items) !== false);
+    /**
+     * Get collection data
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
 
-        if (!$r and $throwException) {
-            throw CollectionException::forNotFoundId($id);
-        }
+    /**
+     * Clear collection
+     *
+     * @return void
+     */
+    public function clear()
+    {
+        $this->data = [];
+    }
 
-        return $r;
+    /**
+     * Get items data itself
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Get collection keys
+     *
+     * @return array
+     */
+    public function keys()
+    {
+        return array_keys($this->data);
+    }
+
+    /**
+     * Get collection values
+     *
+     * @return array
+     */
+    public function values()
+    {
+        return array_values($this->data);
     }
 
     /**
@@ -142,19 +201,131 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
      * @param  mixed $item
      * @return boolean
      */
-    protected function validateItemType($item) {
+    protected function validateItemType($item)
+    {
         if ($this->type != 'mixed') {
             $type = gettype($item);
-            
+
             if ($type == 'object') {
                 if (!($item instanceof $this->type)) {
-                    throw CollectionException::forInvalidType($this->type, $type);
+                    throw CollectionException::forInvalidItemType($this->type, $type);
                 }
+            } else {
+                if ($type != $this->type) {
+                    throw CollectionException::forInvalidItemType($this->type, $type);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the collection has the target key
+     *
+     * @param  mixed $key
+     * @param  boolean $throwException
+     * @return boolean
+     */
+    public function hasKey($key, $throwException = false)
+    {
+        $key = isset($key) ? trim($key) : null;
+        if ($key == '') {
+            $key = null;
+        }
+
+        if (empty($key)) {
+            throw CollectionException::forNoKeySupplied();
+        }
+
+        $r = array_key_exists($key, $this->data);
+
+        if (!$r and $throwException) {
+            throw CollectionException::forKeyNotFound($key);
+        }
+
+        return $r;
+    }
+
+    /**
+     * Check if the collection has the target item
+     *
+     * @param  mixed $item
+     * @param  boolean $throwException
+     * @return boolean
+     */
+    public function hasItem($item, $throwException = false)
+    {
+        $r = (array_search($item, $this->data) !== false);
+
+        if (!$r and $throwException) {
+            throw CollectionException::forItemNotFound($item);
+        }
+
+        return $r;
+    }
+
+    /**
+     * Get collection key from item
+     *
+     * @param  mixed $item
+     * @param  mixed $throwExceptionIfNotFound
+     * @return mixed
+     */
+    public function getKey($item, $throwExceptionIfNotFound = true)
+    {
+        return $this->hasItem($item, $throwExceptionIfNotFound) ? array_search($item, $this->data) : null;
+    }
+
+    /**
+     * Get collection item from key
+     *
+     * @param  mixed $key
+     * @param  mixed $throwExceptionIfNotFound
+     * @return mixed
+     */
+    public function getItem($key, $throwExceptionIfNotFound = true)
+    {
+        return $this->hasKey($key, $throwExceptionIfNotFound) ? $this->data[$key] : null;
+    }
+
+    /**
+     * Add collection item with in a key (key is optinal in simple collection)
+     *
+     * @param  mixed $key
+     * @param  mixed $item
+     * @param  mixed $inserting
+     * @return boolean
+     */
+    protected function _add($key, $item, $inserting = false)
+    {
+        $key = isset($key) ? trim($key) : null;
+        if ($key == '') {
+            $key = null;
+        }
+
+        if (isset($key) and $this->hasKey($key) and ($this->isAssociative() or !$inserting)) {
+            throw CollectionException::forAlreadyDefinedKey($key);
+        }
+
+        if ($this->isUnique() and $this->hasItem($item)) {
+            throw CollectionException::forItemAlreadyExists($item);
+        }
+
+        if ($this->isAssociative() and !isset($key)) {
+            throw CollectionException::forNoKeySupplied();
+        }
+
+        $this->validateItemType($item);
+
+        if ($this->isAssociative() or (isset($key) and !$this->hasKey($key))) {
+            $this->data[$key] = $item;
+        } else {
+            if (isset($key)) {
+                array_splice($this->data, $key, 0, $item);
             }
             else {
-                if ($type != $this->type) {
-                    throw CollectionException::forInvalidType($this->type, $type);
-                }
+                array_push($this->data, $item);
             }
         }
 
@@ -162,58 +333,16 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Clear collection
+     * Delete collection item from key
      *
-     * @return void
-     */
-    protected function clear($item) {
-        $this->items = [];
-    }
-
-    /**
-     * Get items data itself
-     *
-     * @return array
-     */
-    protected function toArray() {
-        return $this->items;
-    }
-
-    /**
-     * Add collection item
-     *
-     * @param  mixed $id
-     * @param  mixed $item
+     * @param  mixed $key
      * @return boolean
      */
-    protected function _add($id, $item = null) {
-        if ($this->hasId($id)) {
-            throw CollectionException::forAlreadyDefinedId($id);
-        }
+    protected function _deleteKey($key)
+    {
+        $this->hasKey($key, true);
 
-        if ($this->isAssociative()) {
-            $this->validateItemType($item);
-            $this->items[$id] = $item;
-        }
-        else {
-            $this->validateItemType($id);
-            $this->items[] = $id;
-        }
-
-        return true;
-    }
-
-    /**
-     * Add collection item if it not exists
-     *
-     * @param  mixed $id
-     * @param  mixed $item
-     * @return boolean
-     */
-    protected function _addIfNotExists($id, $item = null) {
-        if (!$this->hasId($id)) {
-            $this->_add($id, $item);
-        }
+        unset($this->data[$key]);
 
         return true;
     }
@@ -221,49 +350,15 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
     /**
      * Delete collection item
      *
-     * @param  mixed $id
-     * @return mixed
+     * @param  mixed $item
+     * @return boolean
      */
-    protected function _delete($id) {
-        if (!$this->hasId($id)) {
-            throw CollectionException::forNotFoundId($id);
-        }
+    protected function _deleteItem($item)
+    {
+        $this->hasItem($item, true);
 
-        if ($this->isAssociative()) {
-            unset($this->items[$id]);
-        }
-        else {
-            unset($this->items[array_search($id, $this->items)]);
-        }
-        return true;
-    }
-
-    /**
-     * Delete collection item if id exists
-     *
-     * @param  mixed $id
-     * @return mixed
-     */
-    protected function _deleteIfExists($id) {
-        if ($this->hasId($id)) {
-            $this->_delete($id);
-        }
+        unset($this->data[array_search($item, $this->data)]);
 
         return true;
     }
-
-    /**
-     * Get collection item
-     *
-     * @param  mixed $id
-     * @return mixed
-     */
-    protected function _getById($id) {
-        if (!$this->hasId($id)) {
-            throw CollectionException::forNotFoundId($id);
-        }
-
-        return $this->items[$id];
-    }
-
 }
