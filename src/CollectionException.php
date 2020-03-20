@@ -1,6 +1,6 @@
 <?php
 
-namespace Antares\Collection;
+namespace Antares\Support\Collection;
 
 use \Exception;
 
@@ -61,7 +61,7 @@ class CollectionException extends Exception
 
     /**
      * Create a new exception for already defined Key
-     * 
+     *
      * @param  mixed  $key
      * @return static
      */
@@ -72,7 +72,7 @@ class CollectionException extends Exception
 
     /**
      * Create a new exception for item that already exists in the collection
-     * 
+     *
      * @param  mixed  $item
      * @return static
      */
@@ -82,8 +82,8 @@ class CollectionException extends Exception
     }
 
     /**
-     * Create a new exception for key not found 
-     * 
+     * Create a new exception for key not found
+     *
      * @param  mixed  $key
      * @return static
      */
@@ -93,8 +93,8 @@ class CollectionException extends Exception
     }
 
     /**
-     * Create a new exception for item not found 
-     * 
+     * Create a new exception for item not found
+     *
      * @param  mixed  $item
      * @return static
      */

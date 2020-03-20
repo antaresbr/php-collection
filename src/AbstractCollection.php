@@ -1,12 +1,14 @@
 <?php
 
-namespace Antares\Collection;
+namespace Antares\Support\Collection;
 
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use Traversable;
+use JsonSerializable;
 
-abstract class AbstractCollection implements Countable, IteratorAggregate
+abstract class AbstractCollection implements Countable, IteratorAggregate, JsonSerializable, Traversable
 {
     /**
      * Valid types for collectoin items
@@ -112,7 +114,7 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
      */
     public function isEmpty()
     {
-        return ($this->count() == 0);
+        return empty($this->data);
     }
 
     /**
@@ -173,6 +175,16 @@ abstract class AbstractCollection implements Countable, IteratorAggregate
     public function toArray()
     {
         return $this->data;
+    }
+
+    /**
+     * Get items data itself
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 
     /**

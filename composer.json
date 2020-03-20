@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Antares\\Collection\\": "src"
+            "Antares\\Support\\Collection\\": "src"
         }
     },
     "require-dev": {

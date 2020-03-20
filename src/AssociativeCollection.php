@@ -1,6 +1,6 @@
 <?php
 
-namespace Antares\Collection;
+namespace Antares\Support\Collection;
 
 class AssociativeCollection extends AbstractCollection
 {

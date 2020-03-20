@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
-use Antares\Collection\AbstractCollection;
-use Antares\Collection\CollectionException;
-use Antares\Collection\SimpleCollection;
+use Antares\Support\Collection\CollectionException;
+use Antares\Support\Collection\SimpleCollection;
 use PHPUnit\Framework\TestCase;
 
 final class SimpleCollectionTest extends TestCase

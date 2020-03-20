@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
+use Antares\Support\Collection\AssociativeCollection;
+use Antares\Support\Collection\CollectionException;
 use PHPUnit\Framework\TestCase;
-use Antares\Collection\AssociativeCollection;
-use Antares\Collection\CollectionException;
 
 final class AssociativeCollectionTest extends TestCase
 {
