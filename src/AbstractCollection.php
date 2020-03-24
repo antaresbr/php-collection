@@ -88,9 +88,9 @@ abstract class AbstractCollection implements Countable, IteratorAggregate, JsonS
     }
 
     /**
-     * Get items count
+     * Get itarator
      *
-     * @return integer
+     * @return ArrayItarator
      */
     public function getIterator()
     {
@@ -178,7 +178,7 @@ abstract class AbstractCollection implements Countable, IteratorAggregate, JsonS
     }
 
     /**
-     * Get items data itself
+     * Get items data itself for serialization
      *
      * @return array
      */
@@ -335,8 +335,7 @@ abstract class AbstractCollection implements Countable, IteratorAggregate, JsonS
         } else {
             if (isset($key)) {
                 array_splice($this->data, $key, 0, $item);
-            }
-            else {
+            } else {
                 array_push($this->data, $item);
             }
         }
