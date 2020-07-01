@@ -2,7 +2,7 @@
 
 namespace Antares\Support\Collection;
 
-use \Exception;
+use Exception;
 
 class CollectionException extends Exception
 {
@@ -13,7 +13,7 @@ class CollectionException extends Exception
      */
     public static function forNotDefinedItemType()
     {
-        return new static("Item type not defined.");
+        return new static('Item type not defined.');
     }
 
     /**
@@ -46,7 +46,7 @@ class CollectionException extends Exception
      */
     public static function forNoKeySupplied()
     {
-        return new static("No key supplied.");
+        return new static('No key supplied.');
     }
 
     /**
@@ -56,7 +56,7 @@ class CollectionException extends Exception
      */
     public static function forNoItemSupplied()
     {
-        return new static("No item supplied.");
+        return new static('No item supplied.');
     }
 
     /**
@@ -78,7 +78,7 @@ class CollectionException extends Exception
      */
     public static function forItemAlreadyExists($item)
     {
-        return new static("Collection item already exists: ". print_r($item, true));
+        return new static('Collection item already exists: ' . print_r($item, true));
     }
 
     /**
@@ -100,7 +100,6 @@ class CollectionException extends Exception
      */
     public static function forItemNotFound($item)
     {
-        return new static("Item not found: ". print_r($item, true));
+        return new static('Item not found: ' . print_r($item, true));
     }
-
 }

@@ -1,12 +1,13 @@
 <?php declare(strict_types=1);
 
-use Antares\Support\Collection\AssociativeCollection;
+use Antares\Support\AssociativeCollection;
 use Antares\Support\Collection\CollectionException;
 use PHPUnit\Framework\TestCase;
 
 final class AssociativeCollectionTest extends TestCase
 {
-    private function getStringCollection($unique = true, $acceptNulls = true) {
+    private function getStringCollection($unique = true, $acceptNulls = true)
+    {
         $collection = new AssociativeCollection('string', $unique, $acceptNulls);
         $collection->add('a', 'apple');
         $collection->add('b', 'banana');
@@ -111,9 +112,6 @@ final class AssociativeCollectionTest extends TestCase
         $collection->add('z', null);
         $this->assertEquals($collection->count(), 2);
     }
-
-
-
 
     public function testAssociativeStringCollection()
     {

@@ -1,12 +1,13 @@
 <?php declare(strict_types=1);
 
 use Antares\Support\Collection\CollectionException;
-use Antares\Support\Collection\SimpleCollection;
+use Antares\Support\SimpleCollection;
 use PHPUnit\Framework\TestCase;
 
 final class SimpleCollectionTest extends TestCase
 {
-    private function getStringCollection($unique = true, $acceptNulls = true) {
+    private function getStringCollection($unique = true, $acceptNulls = true)
+    {
         $collection = new SimpleCollection('string', $unique, $acceptNulls);
         $collection->add('apple');
         $collection->add('banana');

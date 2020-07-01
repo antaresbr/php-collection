@@ -1,6 +1,8 @@
 <?php
 
-namespace Antares\Support\Collection;
+namespace Antares\Support;
+
+use Antares\Support\Collection\AbstractCollection;
 
 class AssociativeCollection extends AbstractCollection
 {
@@ -22,7 +24,8 @@ class AssociativeCollection extends AbstractCollection
      * @param  mixed $item
      * @return boolean
      */
-    public function add($key, $item) {
+    public function add($key, $item)
+    {
         return parent::_add($key, $item);
     }
 
@@ -33,7 +36,8 @@ class AssociativeCollection extends AbstractCollection
      * @param  mixed $item
      * @return boolean
      */
-    public function addIfNotExists($key, $item) {
+    public function addIfNotExists($key, $item)
+    {
         if (!$this->hasKey($key)) {
             return $this->add($key, $item);
         }
@@ -47,7 +51,8 @@ class AssociativeCollection extends AbstractCollection
      * @param  mixed $key
      * @return boolean
      */
-    public function delete($key) {
+    public function delete($key)
+    {
         return parent::_deleteKey($key);
     }
 
@@ -57,12 +62,12 @@ class AssociativeCollection extends AbstractCollection
      * @param  mixed $key
      * @return boolean
      */
-    public function deleteIfExists($key) {
+    public function deleteIfExists($key)
+    {
         if ($this->hasKey($key)) {
             return $this->delete($key);
         }
 
         return true;
     }
-
 }
