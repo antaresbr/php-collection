@@ -2,13 +2,14 @@
 
 namespace Antares\Support\Collection;
 
+use ArrayAccess;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
-use Traversable;
 use JsonSerializable;
+use Traversable;
 
-abstract class AbstractCollection implements Countable, IteratorAggregate, JsonSerializable, Traversable
+abstract class AbstractCollection implements ArrayAccess, Countable, IteratorAggregate, Traversable, JsonSerializable
 {
     /**
      * Valid types for collectoin items
@@ -50,6 +51,93 @@ abstract class AbstractCollection implements Countable, IteratorAggregate, JsonS
      */
     protected $data = [];
 
+    //-- implements : ArrayAccess
+
+    /**
+     * Determine if an item exists at an offset.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    public function offsetExists($key)
+    {
+        return $this->hasKey($key);
+    }
+
+    /**
+     * Get an item at a given offset.
+     *
+     * @param  mixed  $key
+     * @return mixed
+     */
+    public function offsetGet($key)
+    {
+        return $this->getItem($key);
+    }
+
+    /**
+     * Set the item at a given offset.
+     *
+     * @param  mixed  $key
+     * @param  mixed  $value
+     * @return void
+     */
+    public function offsetSet($key, $value)
+    {
+        $this->_add($key, $value);
+    }
+
+    /**
+     * Unset the item at a given offset.
+     *
+     * @param  string  $key
+     * @return void
+     */
+    public function offsetUnset($key)
+    {
+        $this->_deleteKey($key);
+    }
+
+    //-- implements : Countable
+
+    /**
+     * Get items count
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        return count($this->data);
+    }
+
+    //--[ implements : start ]--
+
+    //-- IteratorAggregate, Traversable
+
+    /**
+     * Get itarator
+     *
+     * @return ArrayItarator
+     */
+    public function getIterator()
+    {
+        return new ArrayIterator($this->data);
+    }
+
+    //-- JsonSerializable
+
+    /**
+     * Get items data itself for serialization
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return $this->toArray();
+    }
+
+    //--[ implements : end ]--
+
     /**
      * Create a new instance of this object.
      *
@@ -75,26 +163,6 @@ abstract class AbstractCollection implements Countable, IteratorAggregate, JsonS
         $this->associative = $associative;
         $this->unique = $unique;
         $this->acceptNulls = $acceptNulls;
-    }
-
-    /**
-     * Get items count
-     *
-     * @return integer
-     */
-    public function count()
-    {
-        return count($this->data);
-    }
-
-    /**
-     * Get itarator
-     *
-     * @return ArrayItarator
-     */
-    public function getIterator()
-    {
-        return new ArrayIterator($this->data);
     }
 
     /**
@@ -175,16 +243,6 @@ abstract class AbstractCollection implements Countable, IteratorAggregate, JsonS
     public function toArray()
     {
         return $this->data;
-    }
-
-    /**
-     * Get items data itself for serialization
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return $this->toArray();
     }
 
     /**
